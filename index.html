@@ -446,8 +446,64 @@
         .split("T")[0];
 
       const btnNo = document.getElementById("btn-no");
+      const btnYes = document.getElementById("btn-yes");
       const container = document.querySelector(".phone-container");
 
+      // === وضع زر no في مكان بعيد عن yes عند التحميل ===
+      function initializeBtnNoPosition() {
+        setTimeout(() => {
+          const btnRect = btnNo.getBoundingClientRect();
+          const yesRect = btnYes.getBoundingClientRect();
+          const padding = 30;
+
+          // منطقة yes (نضيف هامش أمان 150 بكسل حوالينها)
+          const yesZone = {
+            left: yesRect.left - 150,
+            right: yesRect.right + 150,
+            top: yesRect.top - 150,
+            bottom: yesRect.bottom + 150,
+          };
+
+          let newX,
+            newY,
+            attempts = 0;
+
+          // نحاول نجد مكان بعيد عن yes (حد أقصى 50 محاولة)
+          do {
+            newX =
+              Math.random() *
+                (window.innerWidth - btnRect.width - padding * 2) +
+              padding;
+            newY =
+              Math.random() *
+                (window.innerHeight - btnRect.height - padding * 2) +
+              padding;
+            attempts++;
+          } while (
+            attempts < 50 &&
+            newX > yesZone.left &&
+            newX < yesZone.right &&
+            newY > yesZone.top &&
+            newY < yesZone.bottom
+          );
+
+          // لو ملاقيناش مكان بعد 50 محاولة، نحطه في ركن بعيد
+          if (attempts >= 50) {
+            newX = window.innerWidth - btnRect.width - padding;
+            newY = window.innerHeight - btnRect.height - padding;
+          }
+
+          btnNo.style.position = "fixed";
+          btnNo.style.left = newX + "px";
+          btnNo.style.top = newY + "px";
+          btnNo.style.transform = "none";
+        }, 100); // ننتظر شوية عشان العناصر تترسم
+      }
+
+      // تشغيل الدالة عند تحميل الصفحة
+      window.addEventListener("load", initializeBtnNoPosition);
+
+      // حركة عكس الماوس - على مستوى الصفحة كلها
       document.addEventListener("mousemove", function (e) {
         const btnRect = btnNo.getBoundingClientRect();
         const padding = 15;
@@ -482,6 +538,7 @@
         }
       });
 
+      // دعم اللمس على الموبايل
       document.addEventListener(
         "touchmove",
         function (e) {
