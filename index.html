@@ -177,7 +177,7 @@
       #btn-no {
         background: linear-gradient(135deg, #b0b0b0, #9a9a9a);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        position: absolute;
+        position: fixed;
         z-index: 10;
         transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
@@ -449,59 +449,29 @@
       const btnYes = document.getElementById("btn-yes");
       const container = document.querySelector(".phone-container");
 
-      // === وضع زر no في مكان بعيد عن yes عند التحميل ===
+      // === وضع زر no في أعلى الشاشة عند التحميل (يعمل على الموبايل والكمبيوتر) ===
       function initializeBtnNoPosition() {
         setTimeout(() => {
           const btnRect = btnNo.getBoundingClientRect();
-          const yesRect = btnYes.getBoundingClientRect();
-          const padding = 30;
-
-          // منطقة yes (نضيف هامش أمان 150 بكسل حوالينها)
-          const yesZone = {
-            left: yesRect.left - 150,
-            right: yesRect.right + 150,
-            top: yesRect.top - 150,
-            bottom: yesRect.bottom + 150,
-          };
-
-          let newX,
-            newY,
-            attempts = 0;
-
-          // نحاول نجد مكان بعيد عن yes (حد أقصى 50 محاولة)
-          do {
-            newX =
-              Math.random() *
-                (window.innerWidth - btnRect.width - padding * 2) +
-              padding;
-            newY =
-              Math.random() *
-                (window.innerHeight - btnRect.height - padding * 2) +
-              padding;
-            attempts++;
-          } while (
-            attempts < 50 &&
-            newX > yesZone.left &&
-            newX < yesZone.right &&
-            newY > yesZone.top &&
-            newY < yesZone.bottom
-          );
-
-          // لو ملاقيناش مكان بعد 50 محاولة، نحطه في ركن بعيد
-          if (attempts >= 50) {
-            newX = window.innerWidth - btnRect.width - padding;
-            newY = window.innerHeight - btnRect.height - padding;
-          }
+          const padding = 20;
+          
+          // نضع الزر في أعلى الشاشة في منتصف أفقي عشوائي
+          const maxX = window.innerWidth - btnRect.width - padding * 2;
+          const randomX = Math.random() * maxX + padding;
+          const topY = padding + 10; // أعلى الشاشة مع هامش صغير
 
           btnNo.style.position = "fixed";
-          btnNo.style.left = newX + "px";
-          btnNo.style.top = newY + "px";
+          btnNo.style.left = randomX + "px";
+          btnNo.style.top = topY + "px";
           btnNo.style.transform = "none";
-        }, 100); // ننتظر شوية عشان العناصر تترسم
+        }, 150); // ننتظر قليلاً لضمان تحميل العناصر بشكل صحيح على الموبايل
       }
 
       // تشغيل الدالة عند تحميل الصفحة
       window.addEventListener("load", initializeBtnNoPosition);
+      
+      // أيضاً نعيد المحاولة بعد فترة قصيرة للموبايل
+      setTimeout(initializeBtnNoPosition, 300);
 
       // حركة عكس الماوس - على مستوى الصفحة كلها
       document.addEventListener("mousemove", function (e) {
@@ -575,7 +545,7 @@
             btnNo.style.transform = "none";
           }
         },
-        { passive: true },
+        { passive: true }
       );
 
       function nextStep(stepNumber) {
