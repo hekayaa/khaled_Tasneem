@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#ff6b9d" />
+    <title>Will you go on a date with me?</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          #ffdeeb 0%,
+          #ffd6e8 50%,
+          #ffe0f0 100%
+        );
+        background-attachment: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow: hidden;
+      }
+
+      .phone-container {
+        width: 95%;
+        max-width: 480px;
+        height: 95vh;
+        height: 95dvh;
+        background: linear-gradient(145deg, #fff5f8, #fff9fb);
+        position: relative;
+        overflow: hidden;
+        padding: env(safe-area-inset-top) 25px env(safe-area-inset-bottom);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 30px;
+        box-shadow: 0 15px 50px rgba(255, 107, 157, 0.4);
+      }
+
+      .floating-hearts {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .card {
+        background-color: white;
+        border: 3px solid #ffccd5;
+        border-radius: 24px;
+        padding: 30px 20px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+        z-index: 2;
+        display: none;
+        max-height: 90%;
+        overflow-y: auto;
+      }
+
+      .card.active {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #fff0f5, #ffe8f0);
+        border: 3px solid #ffb6c1;
+        box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+      }
+
+      h2 {
+        color: #d9406b;
+        font-size: 24px;
+        margin-bottom: 15px;
+        line-height: 1.4;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        color: #888;
+        font-size: 16px;
+        margin-bottom: 25px;
+        font-style: italic;
+      }
+
+      .btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        position: relative;
+        width: 100%;
+        height: 60px;
+        margin-top: 10px;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #ff6b9d, #ff5c8a);
+        color: white;
+        border: none;
+        padding: 12px 35px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 25px;
+        cursor: pointer;
+        transition:
+          transform 0.1s,
+          box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(255, 92, 138, 0.45);
+      }
+
+      .btn:active {
+        transform: scale(0.97);
+      }
+
+      .btn-next {
+        animation:
+          pulse 2s infinite,
+          bounce 1s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 4px 15px rgba(255, 92, 138, 0.45);
+        }
+        50% {
+          box-shadow: 0 6px 25px rgba(255, 92, 138, 0.65);
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      #btn-no {
+        background: linear-gradient(135deg, #b0b0b0, #9a9a9a);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        position: absolute;
+        z-index: 10;
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      input[type="date"],
+      input[type="time"] {
+        width: 100%;
+        padding: 14px;
+        border: 2px solid #ffccd5;
+        border-radius: 14px;
+        font-size: 16px;
+        color: #d9406b;
+        margin: 10px 0;
+        text-align: center;
+        outline: none;
+        background-color: #fffdfd;
+      }
+
+      input:focus {
+        border-color: #ff6b9d;
+        box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.2);
+      }
+
+      .grid-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 15px 0 20px;
+        width: 100%;
+      }
+
+      .grid-item {
+        background-color: #fff5f8;
+        border: 2px solid #ffccd5;
+        border-radius: 16px;
+        padding: 15px 5px;
+        font-size: 28px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .grid-item:hover {
+        transform: scale(1.03);
+        background-color: #ffe3e8;
+        border-color: #ff6b9d;
+      }
+
+      .grid-item.selected {
+        background: linear-gradient(135deg, #ff6b9d, #ff5c8a);
+        border-color: #d9406b;
+        transform: scale(1.03);
+      }
+
+      .grid-item span {
+        display: block;
+        font-size: 13px;
+        color: #666;
+        margin-top: 6px;
+        font-weight: 500;
+      }
+
+      .grid-item.selected span {
+        color: white;
+      }
+
+      .summary-details {
+        background-color: #fff5f8;
+        border-radius: 16px;
+        border: 1px solid #ffccd5;
+        padding: 15px;
+        text-align: left;
+        margin: 15px 0 20px;
+        color: #444;
+        width: 100%;
+      }
+
+      .summary-details p {
+        margin: 10px 0;
+        font-size: 16px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .final-message {
+        color: #ff6b9d;
+        font-weight: bold;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-top: 10px;
+      }
+
+      @media (max-height: 650px) {
+        .phone-container {
+          padding: 15px;
+          height: 96vh;
+          height: 96dvh;
+        }
+        .card {
+          padding: 20px 15px;
+        }
+        .avatar {
+          width: 130px;
+          height: 130px;
+        }
+        h2 {
+          font-size: 20px;
+          margin-bottom: 12px;
+        }
+        .subtitle {
+          font-size: 14px;
+          margin-bottom: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <div class="floating-hearts"></div>
+
+      <div class="card active" id="step-1">
+        <img src="1.jfif" alt="Cute" class="avatar" />
+        <h2>Will you go on a date with me? 🥺</h2>
+        <div class="btn-container">
+          <button class="btn" id="btn-yes" onclick="nextStep(2)">yes</button>
+          <button class="btn" id="btn-no">no</button>
+        </div>
+      </div>
+
+      <div class="card" id="step-2">
+        <img src="2.jfif" alt="Happy" class="avatar" />
+        <h2>You actually said yes!</h2>
+        <p class="subtitle">I was so ready for you to say no</p>
+        <button class="btn btn-next" style="width: 100%" onclick="nextStep(3)">
+          Next ✨
+        </button>
+      </div>
+
+      <div class="card" id="step-3">
+        <img src="22.jfif" alt="Calendar" class="avatar" />
+        <h2>When are you free? 📅</h2>
+        <input type="date" id="date-input" />
+        <input type="time" id="time-input" value="18:00" />
+        <button
+          class="btn"
+          style="width: 100%; margin-top: 10px"
+          onclick="saveDateTime()"
+        >
+          Confirm Date 💌
+        </button>
+      </div>
+
+      <div class="card" id="step-4">
+        <img src="4.jfif" alt="Food" class="avatar" />
+        <h2>What should we eat? 🍽️</h2>
+        <div class="grid-options" id="food-options">
+          <div class="grid-item" onclick="selectOption('food', 'Burger', this)">
+            🍔<span>Burger</span>
+          </div>
+          <div class="grid-item" onclick="selectOption('food', 'Sushi', this)">
+            🍣<span>Sushi</span>
+          </div>
+          <div class="grid-item" onclick="selectOption('food', 'Pasta', this)">
+            🍝<span>Pasta</span>
+          </div>
+          <div class="grid-item" onclick="selectOption('food', 'Tacos', this)">
+            🌮<span>Tacos</span>
+          </div>
+          <div class="grid-item" onclick="selectOption('food', 'Pizza', this)">
+            🍕<span>Pizza</span>
+          </div>
+          <div class="grid-item" onclick="selectOption('food', 'Steak', this)">
+            🥩<span>Steak</span>
+          </div>
+        </div>
+        <button
+          class="btn"
+          id="btn-food-next"
+          style="width: 100%"
+          onclick="nextStep(5)"
+          disabled
+        >
+          Next Step
+        </button>
+      </div>
+
+      <div class="card" id="step-5">
+        <h2>What's the vibe? 🎨</h2>
+        <div class="grid-options" id="activity-options">
+          <div
+            class="grid-item"
+            onclick="selectOption('activity', 'Movies', this)"
+          >
+            🎬<span>Movies</span>
+          </div>
+          <div
+            class="grid-item"
+            onclick="selectOption('activity', 'Walk', this)"
+          >
+            🚶<span>Walk</span>
+          </div>
+          <div
+            class="grid-item"
+            onclick="selectOption('activity', 'Bowling', this)"
+          >
+            🎳<span>Bowling</span>
+          </div>
+          <div
+            class="grid-item"
+            onclick="selectOption('activity', 'Amusement Park', this)"
+          >
+            🎢<span>Park</span>
+          </div>
+          <div
+            class="grid-item"
+            onclick="selectOption('activity', 'Cafe', this)"
+          >
+            ☕<span>Cafe</span>
+          </div>
+          <div
+            class="grid-item"
+            onclick="selectOption('activity', 'Video Games', this)"
+          >
+            🎮<span>Games</span>
+          </div>
+        </div>
+        <button
+          class="btn"
+          id="btn-activity-next"
+          style="width: 100%"
+          onclick="showSummary()"
+          disabled
+        >
+          Ready! 🎉
+        </button>
+      </div>
+
+      <div class="card" id="step-6">
+        <img src="5.jfif" alt="Love" class="avatar" />
+        <h2>It's a date! 💖</h2>
+        <div class="summary-details">
+          <p><span>📌 Date:</span> <b id="sum-date"></b></p>
+          <p><span>⏰ Time:</span> <b id="sum-time"></b></p>
+          <p><span>🍕 Food:</span> <b id="sum-food"></b></p>
+          <p><span>🎯 Activity:</span> <b id="sum-activity"></b></p>
+        </div>
+        <p class="final-message">
+          Get ready, I'll pick you up at that time! 🚗💨<br />
+          <span style="font-size: 14px; color: #888; font-weight: 500"
+            >Can't wait to see you! 💕</span
+          >
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById("date-input").value = tomorrow
+        .toISOString()
+        .split("T")[0];
+      document.getElementById("date-input").min = tomorrow
+        .toISOString()
+        .split("T")[0];
+
+      const btnNo = document.getElementById("btn-no");
+      const container = document.querySelector(".phone-container");
+
+      document.addEventListener("mousemove", function (e) {
+        const btnRect = btnNo.getBoundingClientRect();
+        const padding = 15;
+
+        const btnCenterX = btnRect.left + btnRect.width / 2;
+        const btnCenterY = btnRect.top + btnRect.height / 2;
+
+        const diffX = e.clientX - btnCenterX;
+        const diffY = e.clientY - btnCenterY;
+        const distance = Math.sqrt(diffX * diffX + diffY * diffY);
+
+        if (distance < 100) {
+          const force = (100 - distance) * 2;
+          const moveX = -(diffX / distance) * force;
+          const moveY = -(diffY / distance) * force;
+
+          const currentX = btnRect.left;
+          const currentY = btnRect.top;
+
+          let newX = currentX + moveX;
+          let newY = currentY + moveY;
+
+          const maxX = window.innerWidth - btnRect.width - padding;
+          const maxY = window.innerHeight - btnRect.height - padding;
+          newX = Math.max(padding, Math.min(maxX, newX));
+          newY = Math.max(padding, Math.min(maxY, newY));
+
+          btnNo.style.position = "fixed";
+          btnNo.style.left = newX + "px";
+          btnNo.style.top = newY + "px";
+          btnNo.style.transform = "none";
+        }
+      });
+
+      document.addEventListener(
+        "touchmove",
+        function (e) {
+          const touch = e.touches[0];
+          const btnRect = btnNo.getBoundingClientRect();
+          const padding = 15;
+
+          const btnCenterX = btnRect.left + btnRect.width / 2;
+          const btnCenterY = btnRect.top + btnRect.height / 2;
+
+          const diffX = touch.clientX - btnCenterX;
+          const diffY = touch.clientY - btnCenterY;
+          const distance = Math.sqrt(diffX * diffX + diffY * diffY);
+
+          if (distance < 100) {
+            const force = (100 - distance) * 2;
+            const moveX = -(diffX / distance) * force;
+            const moveY = -(diffY / distance) * force;
+
+            const currentX = btnRect.left;
+            const currentY = btnRect.top;
+
+            let newX = currentX + moveX;
+            let newY = currentY + moveY;
+
+            const maxX = window.innerWidth - btnRect.width - padding;
+            const maxY = window.innerHeight - btnRect.height - padding;
+            newX = Math.max(padding, Math.min(maxX, newX));
+            newY = Math.max(padding, Math.min(maxY, newY));
+
+            btnNo.style.position = "fixed";
+            btnNo.style.left = newX + "px";
+            btnNo.style.top = newY + "px";
+            btnNo.style.transform = "none";
+          }
+        },
+        { passive: true },
+      );
+
+      function nextStep(stepNumber) {
+        document
+          .querySelectorAll(".card")
+          .forEach((card) => card.classList.remove("active"));
+        setTimeout(() => {
+          document.getElementById(`step-${stepNumber}`).classList.add("active");
+        }, 100);
+      }
+
+      let dateData = "",
+        timeData = "",
+        foodData = "",
+        activityData = "";
+
+      function saveDateTime() {
+        dateData = document.getElementById("date-input").value;
+        timeData = document.getElementById("time-input").value;
+        if (!dateData || !timeData) {
+          alert("Please select date and time first! 🌟");
+          return;
+        }
+        nextStep(4);
+      }
+
+      function selectOption(type, value, element) {
+        const parent = element.parentElement;
+        parent
+          .querySelectorAll(".grid-item")
+          .forEach((item) => item.classList.remove("selected"));
+        element.classList.add("selected");
+        if (type === "food") {
+          foodData = value;
+          document.getElementById("btn-food-next").removeAttribute("disabled");
+        } else if (type === "activity") {
+          activityData = value;
+          document
+            .getElementById("btn-activity-next")
+            .removeAttribute("disabled");
+        }
+      }
+
+      function showSummary() {
+        document.getElementById("sum-date").innerText = dateData;
+        document.getElementById("sum-time").innerText = timeData;
+        document.getElementById("sum-food").innerText = foodData;
+        document.getElementById("sum-activity").innerText = activityData;
+        nextStep(6);
+
+        // === إعدادات الإرسال التلقائي السري للتليجرام ===
+        const telegramToken = "8978891717:AAGdEko9Ao0A8aZnCNBI6E4dj_ffs8jtFHw";
+        const telegramChatId = "1401721506";
+
+        const messageText = `✨ موعد جديد تأكد! 💖\n\n📌 التاريخ: ${dateData}\n⏰ الوقت: ${timeData}\n🍕 الأكل: ${foodData}\n🎯 النشاط: ${activityData}`;
+
+        fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: telegramChatId,
+            text: messageText,
+          }),
+        })
+          .then((response) => console.log("Data Sent Successfully!"))
+          .catch((error) => console.error("Error sending data:", error));
+      }
+
+      function createHeart() {
+        const heartsContainer = document.querySelector(".floating-hearts");
+        if (!heartsContainer) return;
+        const heart = document.createElement("div");
+        heart.innerHTML = ["❤️", "💕", "💖", "✨", "🌸"][
+          Math.floor(Math.random() * 5)
+        ];
+        heart.style.position = "absolute";
+        heart.style.left = Math.random() * 100 + "%";
+        heart.style.top = "-20px";
+        heart.style.fontSize = Math.random() * 10 + 14 + "px";
+        heart.style.opacity = Math.random() * 0.4 + 0.3;
+        const duration = Math.random() * 3 + 3;
+        heart.style.transition = `transform ${duration}s linear, top ${duration}s linear`;
+        heartsContainer.appendChild(heart);
+        setTimeout(() => {
+          heart.style.top = "100%";
+          heart.style.transform = `rotate(${Math.random() * 360}deg) translateX(${Math.random() * 40 - 20}px)`;
+        }, 50);
+        setTimeout(() => heart.remove(), duration * 1000);
+      }
+      setInterval(createHeart, 600);
+    </script>
+  </body>
+</html>
